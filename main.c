@@ -259,3 +259,110 @@ void cifrar_xor(unsigned char *dado, int tamanho, char chave)
         dado[i] = dado[i] ^ (unsigned char)chave;
     }
 }
+
+// Imprime buffer em hexadecimal
+void exibir_hexadecimal(const unsigned char *dado, int tamanho)
+{
+    for (int i = 0; i < tamanho; i++) {
+        printf("%02X ", dado[i]);
+    }
+    printf("\n");
+}
+
+// Registra uma operação no histórico de logs em memória
+void registrar_log(const char *operacao, const char *payload)
+{
+    if (total_logs < MAX_LOGS) {
+        historico_logs[total_logs].id = total_logs + 1;
+        strncpy(historico_logs[total_logs].operacao, operacao, 29);
+        historico_logs[total_logs].operacao[29] = '\0';
+        
+        strncpy(historico_logs[total_logs].payload, payload, TAM_BUFFER - 1);
+        historico_logs[total_logs].payload[TAM_BUFFER - 1] = '\0';
+
+        historico_logs[total_logs].tamanho_payload = strlen(historico_logs[total_logs].payload);
+        total_logs++;
+    } else {
+        printf("\n[Aviso] Historico de logs cheio! Nao foi possivel registrar a ultima acao.\n");
+    }
+}
+
+// Exibe o relatório formatado de auditoria
+void exibir_relatorio_logs(void)
+{
+    printf("\n=========================================================================\n");
+    printf("                         RELATORIO DE AUDITORIA                          \n");
+    printf("=========================================================================\n");
+    printf("%-5s | %-25s | %-8s | %-25s\n", "ID", "Algoritmo / Operacao", "Tamanho", "Payload Processado");
+    printf("-------------------------------------------------------------------------\n");
+
+    if (total_logs == 0) {
+        printf("Nenhum registro encontrado no historico.\n");
+    } else {
+        for (int i = 0; i < total_logs; i++) {
+            printf("%-5d | %-25s | %-8d | %-25s\n",
+                   historico_logs[i].id,
+                   historico_logs[i].operacao,
+                   historico_logs[i].tamanho_payload,
+                   historico_logs[i].payload);
+        }
+    }
+    printf("=========================================================================\n");
+}
+
+// Busca por um termo específico nos logs gravados
+void buscar_no_historico(const char *termo)
+{
+    int encontrados = 0;
+    printf("\n--- Resultados da Busca por '%s' ---\n", termo);
+
+    for (int i = 0; i < total_logs; i++) {
+        if (strstr(historico_logs[i].payload, termo) != NULL ||
+            strstr(historico_logs[i].operacao, termo) != NULL) {
+            printf("ID: %d | Operacao: %s | Tamanho: %d | Payload: %s\n",
+                   historico_logs[i].id,
+                   historico_logs[i].operacao,
+                   historico_logs[i].tamanho_payload,
+                   historico_logs[i].payload);
+            encontrados++;
+        }
+    }
+
+    if (encontrados == 0) {
+        printf("Nenhum log corresponde ao termo de busca informado.\n");
+    }
+}
+
+// FUNCIONALIDADE EXTRA: Exporta os logs armazenados para um arquivo texto
+void exportar_logs_arquivo(void)
+{
+    if (total_logs == 0) {
+        printf("\n[Aviso] Nao ha logs armazenados para exportar.\n");
+        return;
+    }
+
+    FILE *arquivo = fopen("logs_auditoria.txt", "w");
+    if (arquivo == NULL) {
+        printf("\n[Erro] Nao foi possivel criar o arquivo de exportacao.\n");
+        return;
+    }
+
+    fprintf(arquivo, "=========================================================================\n");
+    fprintf(arquivo, "                         RELATORIO DE AUDITORIA                          \n");
+    fprintf(arquivo, "=========================================================================\n");
+    fprintf(arquivo, "%-5s | %-25s | %-8s | %-25s\n", "ID", "Algoritmo / Operacao", "Tamanho", "Payload Processado");
+    fprintf(arquivo, "-------------------------------------------------------------------------\n");
+
+    for (int i = 0; i < total_logs; i++) {
+        fprintf(arquivo, "%-5d | %-25s | %-8d | %-25s\n",
+                historico_logs[i].id,
+                historico_logs[i].operacao,
+                historico_logs[i].tamanho_payload,
+                historico_logs[i].payload);
+    }
+
+    fprintf(arquivo, "=========================================================================\n");
+    fclose(arquivo);
+
+    printf("\n[Sucesso] Logs exportados com sucesso para 'logs_auditoria.txt'!\n");
+}
