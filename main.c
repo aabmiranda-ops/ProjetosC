@@ -179,3 +179,20 @@ int main(void)
 
     return 0;
 }
+void limpar_buffer_entrada(void)
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
+}
+
+// Leitura segura de strings utilizando fgets
+void ler_string_segura(char *buffer, int tamanho)
+{
+    if (fgets(buffer, tamanho, stdin) != NULL) {
+        size_t len = strlen(buffer);
+        if (len > 0 && buffer[len - 1] == '\n') {
+            buffer[len - 1] = '\0';
+        }
+    }
+}
