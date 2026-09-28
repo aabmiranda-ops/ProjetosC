@@ -5,7 +5,6 @@
 #define TAM_BUFFER 100
 #define MAX_LOGS 10
 
-// Estrutura para armazenar metadados dos logs de auditoria
 typedef struct {
     int id;
     char operacao[30];
@@ -13,11 +12,9 @@ typedef struct {
     char payload[TAM_BUFFER];
 } LogAuditoria;
 
-// Variáveis globais para controle do histórico
 LogAuditoria historico_logs[MAX_LOGS];
 int total_logs = 0;
 
-// Protótipos das funções
 void limpar_buffer_entrada(void);
 void ler_string_segura(char *buffer, int tamanho);
 void mascarar_dados(char *dado);
@@ -31,7 +28,8 @@ void exibir_hexadecimal(const unsigned char *dado, int tamanho);
 void registrar_log(const char *operacao, const char *payload);
 void exibir_relatorio_logs(void);
 void buscar_no_historico(const char *termo);
-void exportar_logs_arquivo(void); // Funcionalidade Extra
+void exportar_logs_arquivo(void);
+
 int main(void)
 {
     int opcao;
@@ -139,7 +137,6 @@ int main(void)
                 printf("Payload cifrado (Hexadecimal): ");
                 exibir_hexadecimal((unsigned char *)buffer, tamanho);
 
-                // Converte bytes hex para representação string no log
                 char hex_str[TAM_BUFFER] = "";
                 for (int i = 0; i < tamanho && (i * 3) < TAM_BUFFER - 4; i++) {
                     char temp[4];
@@ -179,6 +176,7 @@ int main(void)
 
     return 0;
 }
+
 void limpar_buffer_entrada(void)
 {
     int c;
@@ -186,7 +184,6 @@ void limpar_buffer_entrada(void)
         ;
 }
 
-// Leitura segura de strings utilizando fgets
 void ler_string_segura(char *buffer, int tamanho)
 {
     if (fgets(buffer, tamanho, stdin) != NULL) {
@@ -196,7 +193,7 @@ void ler_string_segura(char *buffer, int tamanho)
         }
     }
 }
-// Mascara os caracteres mantendo apenas os 4 últimos visíveis
+
 void mascarar_dados(char *dado)
 {
     int tamanho = strlen(dado);
@@ -208,7 +205,6 @@ void mascarar_dados(char *dado)
     }
 }
 
-// Valida complexidade mínima de senha
 int validar_senha(const char *senha)
 {
     int tamanho = strlen(senha);
@@ -232,7 +228,6 @@ int validar_senha(const char *senha)
     return (tem_maiuscula && tem_minuscula && tem_digito);
 }
 
-// Aplica Cifra de César
 void cifrar_cesar(char *texto, int deslocamento)
 {
     deslocamento = (deslocamento % 26 + 26) % 26;
@@ -246,13 +241,11 @@ void cifrar_cesar(char *texto, int deslocamento)
     }
 }
 
-// Descifra a Cifra de César chamando a cifragem com deslocamento negativo
 void descifrar_cesar(char *texto, int deslocamento)
 {
     cifrar_cesar(texto, -deslocamento);
 }
 
-// Cifra via XOR bit-a-bit
 void cifrar_xor(unsigned char *dado, int tamanho, char chave)
 {
     for (int i = 0; i < tamanho; i++) {
@@ -260,7 +253,6 @@ void cifrar_xor(unsigned char *dado, int tamanho, char chave)
     }
 }
 
-// Imprime buffer em hexadecimal
 void exibir_hexadecimal(const unsigned char *dado, int tamanho)
 {
     for (int i = 0; i < tamanho; i++) {
@@ -269,7 +261,6 @@ void exibir_hexadecimal(const unsigned char *dado, int tamanho)
     printf("\n");
 }
 
-// Registra uma operação no histórico de logs em memória
 void registrar_log(const char *operacao, const char *payload)
 {
     if (total_logs < MAX_LOGS) {
@@ -287,7 +278,6 @@ void registrar_log(const char *operacao, const char *payload)
     }
 }
 
-// Exibe o relatório formatado de auditoria
 void exibir_relatorio_logs(void)
 {
     printf("\n=========================================================================\n");
@@ -310,7 +300,6 @@ void exibir_relatorio_logs(void)
     printf("=========================================================================\n");
 }
 
-// Busca por um termo específico nos logs gravados
 void buscar_no_historico(const char *termo)
 {
     int encontrados = 0;
@@ -333,7 +322,6 @@ void buscar_no_historico(const char *termo)
     }
 }
 
-// FUNCIONALIDADE EXTRA: Exporta os logs armazenados para um arquivo texto
 void exportar_logs_arquivo(void)
 {
     if (total_logs == 0) {
