@@ -196,3 +196,66 @@ void ler_string_segura(char *buffer, int tamanho)
         }
     }
 }
+// Mascara os caracteres mantendo apenas os 4 últimos visíveis
+void mascarar_dados(char *dado)
+{
+    int tamanho = strlen(dado);
+    if (tamanho <= 4) {
+        return;
+    }
+    for (int i = 0; i < tamanho - 4; i++) {
+        dado[i] = '*';
+    }
+}
+
+// Valida complexidade mínima de senha
+int validar_senha(const char *senha)
+{
+    int tamanho = strlen(senha);
+    int tem_maiuscula = 0, tem_minuscula = 0, tem_digito = 0;
+
+    if (tamanho < 8) {
+        return 0;
+    }
+
+    for (int i = 0; i < tamanho; i++) {
+        char c = senha[i];
+        if (c >= 'A' && c <= 'Z') {
+            tem_maiuscula = 1;
+        } else if (c >= 'a' && c <= 'z') {
+            tem_minuscula = 1;
+        } else if (c >= '0' && c <= '9') {
+            tem_digito = 1;
+        }
+    }
+
+    return (tem_maiuscula && tem_minuscula && tem_digito);
+}
+
+// Aplica Cifra de César
+void cifrar_cesar(char *texto, int deslocamento)
+{
+    deslocamento = (deslocamento % 26 + 26) % 26;
+
+    for (int i = 0; texto[i] != '\0'; i++) {
+        if (texto[i] >= 'A' && texto[i] <= 'Z') {
+            texto[i] = 'A' + (texto[i] - 'A' + deslocamento) % 26;
+        } else if (texto[i] >= 'a' && texto[i] <= 'z') {
+            texto[i] = 'a' + (texto[i] - 'a' + deslocamento) % 26;
+        }
+    }
+}
+
+// Descifra a Cifra de César chamando a cifragem com deslocamento negativo
+void descifrar_cesar(char *texto, int deslocamento)
+{
+    cifrar_cesar(texto, -deslocamento);
+}
+
+// Cifra via XOR bit-a-bit
+void cifrar_xor(unsigned char *dado, int tamanho, char chave)
+{
+    for (int i = 0; i < tamanho; i++) {
+        dado[i] = dado[i] ^ (unsigned char)chave;
+    }
+}
